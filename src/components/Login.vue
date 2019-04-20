@@ -49,9 +49,17 @@
 </template>
 
 <script>
+import appConfigs from '../configs';
+import Vue from 'vue'
+import { Checkbox } from 'ant-design-vue';
+Vue.use(Checkbox)
+
 export default {
   beforeCreate() {
     this.form = this.$form.createForm(this);
+  },
+  created() {
+    console.log('configs loaded: ', appConfigs)
   },
   methods: {
     handleSubmit(e) {
@@ -59,7 +67,7 @@ export default {
       let that = this;
       this.form.validateFields((err, values) => {
         if (!err) {
-          that.$http.post("http://localhost/user/auth", values).then(
+          that.$http.post( appConfigs.ApiBaseUrl + "/user/auth", values).then(
             resp => {
               console.log("status: ", resp.status);
               console.log(resp.body);

@@ -22,22 +22,36 @@ const defaultUser = {
     }
 };
 
+const departments = [
+    {
+        id:1,
+        pId:0,
+        value: '1',
+        label: '公安部'
+    }
+]
+
 const store = new Vuex.Store({
     // options
     state() {
         return {
-            user: null
+            user: null,
+            departmentsForTree: departments,
         }
     },
     // 通过$store.commit('datakey', dataObj)来调用mutation
     mutations: {
         user: (state, user) => {
             state.user = user
+        },
+        departmentsForTree: (state, data) =>{
+            state.departmentsForTree = data
         }
     },
     // 相当于计算属性
     getters: {
         user: state => state.user,
+        departmentsForTree: state => state.departmentsForTree
     }
 })
 

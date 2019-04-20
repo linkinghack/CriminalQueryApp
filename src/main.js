@@ -6,8 +6,11 @@ import router from './router'
 import store from './store'
 import VueResource from 'vue-resource'
 import * as filters from './filter'
-import Antd from 'ant-design-vue'
+import {Layout, Form, Table, Button, Menu, Icon, Input}from 'ant-design-vue'
+import {Col, Row, List, Select} from 'ant-design-vue'
+import {message, notification, Modal} from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
+import appConfigs from './configs';
 
 Vue.config.productionTip = false
 
@@ -20,7 +23,26 @@ for (const key in filters) {
 Vue.use(VueResource);
 
 //antd
-Vue.use(Antd)
+Vue.use(Layout)
+Vue.use(Form)
+Vue.use(Table)
+Vue.use(Button)
+Vue.use(Menu)
+Vue.use(Icon)
+Vue.use(Input)
+Vue.use(Col)
+Vue.use(Row)
+Vue.use(List)
+Vue.use(Select)
+Vue.use(notification)
+Vue.use(message)
+Vue.prototype.$message = message;
+Vue.prototype.$notification = notification;
+Vue.prototype.$info = Modal.info;
+Vue.prototype.$success = Modal.success;
+Vue.prototype.$error = Modal.error;
+Vue.prototype.$warning = Modal.warning;
+Vue.prototype.$confirm = Modal.confirm;
 
 /* eslint-disable no-new */
 new Vue({
@@ -30,6 +52,7 @@ new Vue({
   components: { App },
   template: '<App/>',
   created() {
+    // 添加登录态前端校验
     this.$http.interceptors.push(function(request) {
       return function(response) {
         if (response.status == 403) {
