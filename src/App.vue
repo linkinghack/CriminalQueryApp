@@ -8,11 +8,11 @@
       @collapse="onCollapse"
       @breakpoint="onBreakpoint"
     >
-      <div class="logo"> 逃犯查询系统 </div>
+      <div class="logo">逃犯查询系统</div>
       <!-- 菜单栏 -->
       <a-menu
         style="width: 240px"
-        :defaultOpenKeys="['sub1']"
+        :defaultOpenKeys="[opendSub]"
         mode="inline"
         :theme="theme"
         :selectedKeys="[current]"
@@ -118,10 +118,11 @@
   </a-layout>
 </template>
 <script>
+import appConfigs from "./configs";
 export default {
   data() {
     return {
-      current: "1",
+      currentSel: null,
       theme: "light"
     };
   },
@@ -133,7 +134,7 @@ export default {
       console.log(broken);
     },
     handleClick(e) {
-      this.current = e.key;
+      this.currentSel = e.key;
     },
     onCollapse(collapsed, type) {
       console.log(collapsed, type);
@@ -155,6 +156,27 @@ export default {
   computed: {
     user() {
       return this.$store.getters.user;
+    },
+    current() {
+      let curr = appConfigs.menuUrlMap[this.$route.path];
+      return curr;
+    },
+    opendSub() {
+      let open = "";
+      if (this.current >= 1 && this.current <= 3) {
+        open = "sub1";
+      } else if (this.current >= 4 && this.current <= 8) {
+        open = "sub2";
+      } else if (this.current >= 9 && this.current <= 10) {
+        open = "sub3";
+      } else if (this.current >= 11 && this.current <= 12) {
+        open = "sub4";
+      } else if (this.current >= 14 && this.current <= 15) {
+        open = "sub5";
+      } else {
+        open = "";
+      }
+      return open;
     }
   }
 };
