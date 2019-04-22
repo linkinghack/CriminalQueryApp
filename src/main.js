@@ -6,8 +6,8 @@ import router from './router'
 import store from './store'
 import VueResource from 'vue-resource'
 import * as filters from './filter'
-import {Layout, Form, Table, Button, Menu, Icon, Input}from 'ant-design-vue'
-import {Col, Row, List, Select} from 'ant-design-vue'
+import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps}from 'ant-design-vue'
+import {Col, Row, List, Select, Cascader} from 'ant-design-vue'
 import {message, notification, Modal} from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import appConfigs from './configs';
@@ -36,6 +36,9 @@ Vue.use(List)
 Vue.use(Select)
 Vue.use(notification)
 Vue.use(message)
+Vue.use(Cascader)
+Vue.use(Drawer)
+Vue.use(Steps)
 Vue.prototype.$message = message;
 Vue.prototype.$notification = notification;
 Vue.prototype.$info = Modal.info;
@@ -61,6 +64,11 @@ new Vue({
           this.$router.push({name:"login", params:{}})
         }
       }
-    })
+    });
   },
+})
+
+Vue.http.interceptors.push((req, next)=>{
+  req.credentials = true;
+  next();
 })

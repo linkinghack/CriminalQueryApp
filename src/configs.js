@@ -1,8 +1,9 @@
 const appConfigs = {
     ApiBaseUrl:"https://api.tyut.life",
     menuUrlMap: {
-        '/criminals': "1",
+        '/criminalquery': "1",
         '/departments': "9",
+        '/createWantedOrder': "4",
         '/login': "",
         '/register':"",
         '/':""

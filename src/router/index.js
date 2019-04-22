@@ -7,7 +7,8 @@ import FAQ from '@/components/FAQ.vue'
 import Login from '@/components/Login.vue'
 import Register from '@/components/Register'
 import Departments from '@/components/DepartmentManage'
-
+import CriminalQuery from '@/components/CriminalQuery'
+import CreateWantedOrder from '@/components/CreateWantedOrder'
 Vue.use(VueRouter);
 
 const routers = [
@@ -17,6 +18,8 @@ const routers = [
   { path: '/login', name: 'login', component: Login},
   { path: '/register', name: 'register', component: Register},
   { path: '/departments', name: 'departments', component: Departments},
+  { path: '/criminalquery', name: 'criminalquery', component: CriminalQuery},
+  { path: '/createWantedOrder', name: 'createWantedOrder', component: CreateWantedOrder},
 
   // not found page
   { path: '*', component: NotFound }
@@ -37,8 +40,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next)=> {
-  console.log('to', to.name)
-  console.log('hello router')
+  console.log('@route-beforeEach: to ', to.name)
   // 路由路径中包含任意一个私有页面都将跳转至登录页面
   if(to.matched.some(r => r.meta.private)  && !store.getters.user) {
     next({name:'login', params:{wantedRoute:to.fullPath}})

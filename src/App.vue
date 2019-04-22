@@ -24,7 +24,9 @@
             <span>查询系统</span>
           </span>
           <a-menu-item key="1">
-            <a-icon type="folder-open"/>逃犯查询
+            <router-link :to="{name:'criminalquery'}">
+              <a-icon type="folder-open"/>逃犯查询
+            </router-link>
           </a-menu-item>
           <a-menu-item key="2">
             <a-icon type="folder-open"/>通缉令查询
@@ -39,7 +41,11 @@
             <a-icon type="warning"/>
             <span>通缉管理</span>
           </span>
-          <a-menu-item key="4">发起通缉</a-menu-item>
+          
+          <a-menu-item key="4">
+          <router-link :to="{name:'createWantedOrder'}">发起通缉</router-link>
+          </a-menu-item>
+          
           <a-menu-item key="6">我发布的通缉令</a-menu-item>
           <a-menu-item key="7">我发布的嫌犯</a-menu-item>
           <a-menu-item key="8">申请广范围发布本区通缉</a-menu-item>
@@ -150,6 +156,9 @@ export default {
     },
     logout(e) {
       console.log("logout");
+      this.$http
+        .post(appConfigs.ApiBaseUrl + "/logout")
+        .then(resp => {}, resp => {});
       this.$store.commit("user", null);
     }
   },
@@ -158,6 +167,7 @@ export default {
       return this.$store.getters.user;
     },
     current() {
+      // 使用计算属性来实现选中项 路径同步
       let curr = appConfigs.menuUrlMap[this.$route.path];
       return curr;
     },

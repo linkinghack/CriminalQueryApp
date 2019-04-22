@@ -39,10 +39,10 @@
             initialValue: true,
           }
         ]"
-        >Remember me</a-checkbox>
+        >1小时免登录</a-checkbox>
         <a class="login-form-forgot" href>Forgot password</a>
         <a-button type="primary" html-type="submit" class="login-form-button">Log in</a-button>Or
-        <router-link :to="{name:'register'}">register now!</router-link>
+        <router-link :to="{name:'register'}">没有账户,注册一个</router-link>
       </a-form-item>
     </a-form>
   </div>
