@@ -8,7 +8,7 @@ import Login from '@/components/Login.vue'
 import Register from '@/components/Register'
 import Departments from '@/components/DepartmentManage'
 import CriminalQuery from '@/components/CriminalQuery'
-import CreateWantedOrder from '@/components/CreateWantedOrder'
+import SubmitCriminalAndWantedOrder from '@/components/SubmitCriminalAndWantedOrder'
 Vue.use(VueRouter);
 
 const routers = [
@@ -19,7 +19,7 @@ const routers = [
   { path: '/register', name: 'register', component: Register},
   { path: '/departments', name: 'departments', component: Departments},
   { path: '/criminalquery', name: 'criminalquery', component: CriminalQuery},
-  { path: '/createWantedOrder', name: 'createWantedOrder', component: CreateWantedOrder},
+  { path: '/submitcriminal', name: 'submitcriminal', component: SubmitCriminalAndWantedOrder},
 
   // not found page
   { path: '*', component: NotFound }

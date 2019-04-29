@@ -43,7 +43,7 @@
           </span>
           
           <a-menu-item key="4">
-          <router-link :to="{name:'createWantedOrder'}">发起通缉</router-link>
+          <router-link :to="{name:'submitcriminal'}">发起通缉</router-link>
           </a-menu-item>
           
           <a-menu-item key="6">我发布的通缉令</a-menu-item>
@@ -100,6 +100,8 @@
             你好:
             <span v-if="user.role==1">管理员</span>
             {{user.realName}}
+            <a-divider type="vertical" />
+            <span v-if="userDepartment"> 所属部门: {{userDepartment.departmentName}} </span>
           </div>
           <div v-else>
             <span>请登录</span>
@@ -156,15 +158,22 @@ export default {
     },
     logout(e) {
       console.log("logout");
+      let that = this
       this.$http
-        .post(appConfigs.ApiBaseUrl + "/logout")
+        .post(appConfigs.ApiBaseUrl + "/sso/logout/" + localStorage.getItem('token'))
         .then(resp => {}, resp => {});
       this.$store.commit("user", null);
+      this.$store.commit('userDepartment', null)
+      this.$router.replace({ name: "login"} )
+      localStorage.clear()
     }
   },
   computed: {
     user() {
-      return this.$store.getters.user;
+      return this.$store.getters.user
+    },
+    userDepartment() {
+      return this.$store.getters.userDepartment
     },
     current() {
       // 使用计算属性来实现选中项 路径同步

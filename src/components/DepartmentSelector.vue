@@ -27,7 +27,11 @@ export default {
       console.log("DeaprtmentSelector: loading data...")
       let that = this;
       // 加载省级部门数据
-      that.$http.get(appConfigs.ApiBaseUrl + "/departments/tree/nodes").then(
+      that.$http.get(appConfigs.ApiBaseUrl + "/departments/tree/nodes", {
+        headers: {
+          Token: localStorage.getItem("token")
+        }
+      }).then(
         resp => {
           // 成功
           console.log("provinces loaded. ", resp.status);

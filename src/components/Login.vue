@@ -50,7 +50,8 @@
 
 <script>
 import appConfigs from '../configs';
-import Vue from 'vue'
+import axios from 'axios';
+import Vue from 'vue';
 import { Checkbox } from 'ant-design-vue';
 Vue.use(Checkbox)
 
@@ -62,24 +63,52 @@ export default {
     console.log('configs loaded: ', appConfigs)
   },
   methods: {
+    loadUserDepartment() {
+        let user = this.$store.getters.user;
+        let that = this;
+        if(user) {
+          console.log("用户信息存在，加载所属部门信息")
+          axios.get(appConfigs.ApiBaseUrl + "/user/ofDepartment/" + user.id)
+            .then(response => {
+              if(response.status == 200 && response.data.status==200) {
+                let department = response.data.data
+                localStorage.setItem('userDepartment', JSON.stringify(department))
+                that.$store.commit('userDepartment', department)
+              } else {
+                that.$message.warning("无法加载所属部门信息")
+              }
+            })
+            .catch(error => {
+              console.log(error)
+              that.$message.error("加载所属部门错误")
+            })
+        }
+    }
+    ,
     handleSubmit(e) {
       e.preventDefault();
       let that = this;
       this.form.validateFields((err, values) => {
         if (!err) {
-          that.$http.post( appConfigs.ApiBaseUrl + "/user/auth", values).then(
+          that.$http.post( appConfigs.ApiBaseUrl + "/sso/login", values).then(
             resp => {
               console.log("status: ", resp.status);
               console.log(resp.body);
-              var data = resp.body;
-              if (data.status == 200) {
+              var respBody = resp.body;
+              if (respBody.status == 200) {
                 that.$message.success("登录成功!");
-                that.$store.commit("user", data.data);
-                that.$router.replace(
+                that.$store.commit("user", respBody.data.user);
+                localStorage.setItem('token', respBody.data.token);
+                localStorage.setItem('user', JSON.stringify(respBody.data.user));
+
+                // 异步加载用户所属部门
+                that.loadUserDepartment();
+
+                that.$router.push(
                   that.$route.params.wantedPath || { name: "home" }
                 );
               } else {
-                that.$message.warning(data.data);
+                that.$message.warning(respBody.data);
               }
             },
             resp => {

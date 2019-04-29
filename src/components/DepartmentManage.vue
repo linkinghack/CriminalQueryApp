@@ -82,7 +82,11 @@
       size="small"
     >
       <a-list-item slot="renderItem" slot-scope="item, index">
-        <a slot="actions" @click="deleteDepartment(item.id)">删除</a>
+        <a-popconfirm slot="actions" title="确认删除？" @confirm="deleteDepartment(item.id)">
+          <a-icon slot="icon" type="question-circle-o" style="color: red"/>
+          <a  href="#">删除</a>
+        </a-popconfirm>
+        
         <a-list-item-meta :title="item.departmentName">
           <div slot="description">管辖区域： {{item.districtName}}</div>
         </a-list-item-meta>
@@ -139,9 +143,14 @@ export default {
       let that = this;
 
       this.$http
-        .get(appConfigs.ApiBaseUrl + "/departments/department/" + String(e), {
-          method: "DELETE"
-        })
+        .delete(
+          appConfigs.ApiBaseUrl + "/departments/department/" + String(e),
+          {
+            headers: {
+              Token: localStorage.getItem("token")
+            }
+          }
+        )
         .then(
           resp => {
             if (resp.status == 200 && resp.body.status == 200) {
@@ -164,8 +173,14 @@ export default {
         if (!err) {
           // 校验无错发起请求
           console.log("CreateDepartment: ", values);
+
           that.$http
-            .post(appConfigs.ApiBaseUrl + "/departments/department", values)
+            .post(appConfigs.ApiBaseUrl + "/departments/department", values, {
+              headers: {
+                Token: localStorage.getItem("token")
+              }
+            })
+
             .then(
               resp => {
                 if (resp.status == 200 && resp.body.status == 200) {

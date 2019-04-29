@@ -1,20 +1,14 @@
 <template>
-  <div>
-    逃犯查询
-    <a-icon type="play-circle"/>
-    <district-selector-vue @districtSelected='selected'/>
-    <department-selector-vue placeHolder='选择上级部门' />
+  <div class="page">
+    <criminal-detail />
   </div>
 </template>
 
 <script>
-import DistrictSelectorVue from './DistrictSelector.vue';
-import DepartmentSelectorVue from './DepartmentSelector.vue';
-
+import CriminalDetail from './CriminalDetail.vue'
 export default {
   components: {
-    DistrictSelectorVue,
-    DepartmentSelectorVue
+    CriminalDetail,
   },
   methods: {
     selected(id) {
@@ -26,6 +20,9 @@ export default {
 
 
 <style scoped>
+.page {
+  width: 100%;
+}
 .extender {
   height: 700px;
 }

@@ -4,9 +4,35 @@
 
 <script>
 import appConfigs from "../configs";
+import Axios from 'axios';
 
 export default {
-  props: ["value"],
+  props: ["value", "rootID"],
+  created(){
+    let that = this
+    if(this.rootID != null) {
+      Axios.get(appConfigs.ApiBaseUrl + "/districts/" + that.rootID)
+        .then(response=>{
+          if(response.status == 200 && response.data.status == 200){
+            let district = response.data.data
+            district.value = String(district.id)
+            district.label = district.name
+            if(district.level >= 3){
+              district.isLeaf = true
+            } else {
+              district.isLeaf = false
+            }
+            // 初始化进options
+            that.options = [district]
+            console.log("districts options initiated.")
+            console.log(that.options)
+          }
+        })
+        .catch(error=>{
+
+        })
+    }
+  },
   data() {
     return {
       options: [
@@ -32,10 +58,12 @@ export default {
       //   targetOption.loading = true;
       let that = this;
       this.$http
-        .get(
-          appConfigs.ApiBaseUrl +
-            "/districts/subDistricts/" +
-            targetOption.value
+        .get(appConfigs.ApiBaseUrl + "/districts/subDistricts/" + targetOption.value,
+          {
+            headers: {
+              Token: localStorage.getItem('token')
+            }
+          }
         )
         .then(
           resp => {
