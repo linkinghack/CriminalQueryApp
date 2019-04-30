@@ -6,7 +6,7 @@ import router from './router'
 import store from './store'
 import VueResource from 'vue-resource'
 import * as filters from './filter'
-import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Popconfirm, Card, Switch}from 'ant-design-vue'
+import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Popconfirm, Card, Switch, Collapse, Avatar}from 'ant-design-vue'
 import {Col, Row, List, Select, Cascader} from 'ant-design-vue'
 import {message, notification, Modal} from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
@@ -49,6 +49,8 @@ Vue.use(Divider)
 Vue.use(Popconfirm)
 Vue.use(Card)
 Vue.use(Switch)
+Vue.use(Collapse)
+Vue.use(Avatar)
 Vue.prototype.$message = message;
 Vue.prototype.$notification = notification;
 Vue.prototype.$info = Modal.info;
@@ -69,7 +71,7 @@ new Vue({
     this.$http.interceptors.push(function(request) {
       return function(response) {
         if (response.status == 403) {
-          console.log('status 403')
+          console.log('status 405')
           that.$message.warn("登录态过期,请重新登录");
           that.$router.replace({name:"login", params:{}})
         }

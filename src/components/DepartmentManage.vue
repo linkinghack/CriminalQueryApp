@@ -205,7 +205,9 @@ export default {
     // 显示部门列表
     getData() {
       let that = this;
-      this.$http.get(appConfigs.ApiBaseUrl + "/departments/all").then(
+      this.$http.get(appConfigs.ApiBaseUrl + "/departments/all",{
+        headers: {Token: localStorage.getItem('token')}
+      }).then(
         resp => {
           if (resp.status == 200 && resp.body.status == 200) {
             that.data = resp.body.data;
@@ -225,7 +227,9 @@ export default {
       that.data.map((department, idx, rawArr) => {
         that.$http
           .get(
-            appConfigs.ApiBaseUrl + "/departments/membersCount/" + department.id
+            appConfigs.ApiBaseUrl + "/departments/membersCount/" + department.id,{
+              headers: {Token: localStorage.getItem('token')}
+            }
           )
           .then(
             resp => {
@@ -245,7 +249,9 @@ export default {
       // 修改搜索范围，重新加载页面部门列表
       let that = this;
       that.$http
-        .get(appConfigs.ApiBaseUrl + "/departments/ofDistrict/" + id)
+        .get(appConfigs.ApiBaseUrl + "/departments/ofDistrict/" + id, {
+          headers: {Token: localStorage.getItem('token')}
+        })
         .then(
           resp => {
             if (resp.status == 200 && resp.body.status == 200) {

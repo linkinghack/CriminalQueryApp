@@ -11,7 +11,9 @@ export default {
   created(){
     let that = this
     if(this.rootID != null) {
-      Axios.get(appConfigs.ApiBaseUrl + "/districts/" + that.rootID)
+      Axios.get(appConfigs.ApiBaseUrl + "/districts/" + that.rootID, {
+        headers: {Token: localStorage.getItem('token')}
+      })
         .then(response=>{
           if(response.status == 200 && response.data.status == 200){
             let district = response.data.data

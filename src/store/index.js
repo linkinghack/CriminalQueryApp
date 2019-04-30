@@ -42,6 +42,8 @@ const store = new Vuex.Store({
             newCriminalInfo: null,
             newWantedOrder: null,
             currentCriminalDetail: null,
+            criminalSearchResult: null,
+            searchParams: {},
         }
     },
     // 通过$store.commit('datakey', dataObj)来调用mutation
@@ -66,6 +68,12 @@ const store = new Vuex.Store({
         },
         currentCriminalDetail: (state, detail) => {
             state.currentCriminalDetail = detail
+        },
+        criminalSearchResult: (state, result) => {
+            state.criminalSearchResult = result
+        },
+        searchParams: (state, params) => {
+            state.searchParams = params
         }
     },
     // 相当于计算属性
@@ -77,6 +85,8 @@ const store = new Vuex.Store({
         newCriminalInfo: state => state.newCriminalInfo,
         newWantedOrder: state => state.newWantedOrder,
         currentCriminalDetail: state => state.currentCriminalDetail,
+        criminalSearchResult: state => state.criminalSearchResult,
+        searchParams: state => state.searchParams,
     }
 })
 

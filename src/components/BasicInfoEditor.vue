@@ -150,7 +150,7 @@
     </a-form-item>
 
     <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
-      <a-button type="primary" html-type="submit" :disabled="loading">创建</a-button>
+      <a-button type="primary" html-type="submit" :disabled="loading">更新</a-button>
     </a-form-item>
     <div>
       <a-spin v-if="loading"/>

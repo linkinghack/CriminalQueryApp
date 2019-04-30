@@ -76,7 +76,7 @@
     </a-form-item>
 
     <a-form-item label="逃犯电话" v-bind="formItemLayout">
-      <a-input
+      <a-input type='number'
         v-decorator="[
           'phone',
           {rules: [{ required: false, message: '逃犯电话号码' }]}

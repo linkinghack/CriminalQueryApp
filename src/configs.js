@@ -4,6 +4,7 @@ const appConfigs = {
         '/criminalquery': "1",
         '/departments': "9",
         '/submitcriminal': "4",
+        '/criminalDetail': "",
         '/login': "",
         '/register':"",
         '/':""

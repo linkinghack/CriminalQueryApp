@@ -1,5 +1,5 @@
 <template>
-  <div v-if="criminalDetail">
+  <div style="width:100%" v-if="criminalDetail">
     <!-- 逃犯基本信息 -->
     <a-row type="flex" justify="start">
       <a-col :span="6">
@@ -265,61 +265,12 @@ export default {
       newCluePageVisible: false,
       attributeNameSpan: 7,
       attributeValueSpan: 16,
-      criminalDetail: {
-        criminalBasicInfo: {
-          id: 11,
-          name: "无敌浩克",
-          sex: 1,
-          height: null,
-          birthday: null,
-          age: null,
-          bornPlace: null,
-          idCardID: null,
-          otherFeatures: null,
-          portraitFileID: null,
-          eduBackground: null,
-          job: null,
-          workFor: null,
-          phone: null,
-          address: null,
-          createdAt: "2019-04-28T10:25:03.485827",
-          updatedAt: "2019-04-28T10:25:03.485827",
-          createdBy: 1,
-          updatedBy: 1
-        },
-        criminalContacts: null,
-        wantedOrders: [
-          {
-            id: 4,
-            criminalID: 11,
-            criminalName: null,
-            arrestReason: "sdfgalskjdflkasjdflkajsdlkfajsdlkfjadsa",
-            arrestStatus: 1,
-            arrestLevel: 1,
-            districtID: 120100,
-            district: {
-              id: 120100,
-              supervisorId: 120000,
-              path: [120000, 120100],
-              level: 2,
-              name: "天津市",
-              province: "天津",
-              city: "天津市",
-              county: ""
-            },
-            createdBy: null,
-            createdAt: "2019-04-28T10:25:15.201771",
-            updatedAt: "2019-04-28T10:25:15.201771"
-          }
-        ],
-        clues: []
-      }
     };
   },
   computed: {
-    // criminalDetail() {
-    //   return this.$store.getters.currentCriminalDetail;
-    // }
+    criminalDetail() {
+      return this.$store.getters.currentCriminalDetail;
+    }
   },
   methods: {
     sexSwitch(sex) {

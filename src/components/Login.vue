@@ -68,7 +68,9 @@ export default {
         let that = this;
         if(user) {
           console.log("用户信息存在，加载所属部门信息")
-          axios.get(appConfigs.ApiBaseUrl + "/user/ofDepartment/" + user.id)
+          axios.get(appConfigs.ApiBaseUrl + "/user/ofDepartment/" + user.id, {
+            headers: {Token: localStorage.getItem('token')}
+          })
             .then(response => {
               if(response.status == 200 && response.data.status==200) {
                 let department = response.data.data
