@@ -65,8 +65,8 @@
           textAlign: 'right',
         }"
           >
-            <a-button :style="{marginRight: '8px'}" @click="closeDrawer">Cancel</a-button>
-            <a-button type="primary" html-type="submit">Submit</a-button>
+            <a-button :style="{marginRight: '8px'}" @click="closeDrawer">取消</a-button>
+            <a-button type="primary" html-type="submit">提交</a-button>
           </div>
         </a-form>
       </a-drawer>
@@ -84,9 +84,9 @@
       <a-list-item slot="renderItem" slot-scope="item, index">
         <a-popconfirm slot="actions" title="确认删除？" @confirm="deleteDepartment(item.id)">
           <a-icon slot="icon" type="question-circle-o" style="color: red"/>
-          <a  href="#">删除</a>
+          <a href="#">删除</a>
         </a-popconfirm>
-        
+
         <a-list-item-meta :title="item.departmentName">
           <div slot="description">管辖区域： {{item.districtName}}</div>
         </a-list-item-meta>
@@ -99,6 +99,7 @@
 import appConfigs from "../configs";
 import DistrictSelectorVue from "./DistrictSelector.vue";
 import DepartmentSelectorVue from "./DepartmentSelector.vue";
+import Axios from "axios";
 export default {
   components: {
     DistrictSelectorVue,
@@ -142,28 +143,27 @@ export default {
     deleteDepartment(e) {
       let that = this;
 
-      this.$http
-        .delete(
-          appConfigs.ApiBaseUrl + "/departments/department/" + String(e),
-          {
-            headers: {
-              Token: localStorage.getItem("token")
-            }
+      Axios.delete(
+        appConfigs.ApiBaseUrl + "/departments/department/" + String(e),
+        {
+          headers: {
+            Token: localStorage.getItem("token")
           }
-        )
-        .then(
-          resp => {
-            if (resp.status == 200 && resp.body.status == 200) {
-              that.$message.success(resp.body.data);
-            } else {
-              that.$message.warning(resp.body.data);
-            }
-            that.getData();
-          },
-          resp => {
-            that.$message.error("删除失败");
+        }
+      )
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.$message.success(resp.data.data);
+          } else {
+            that.$message.warning(resp.data.data);
           }
-        );
+          that.getData();
+        })
+        .catch(err => {
+          console.log("删除部门失败");
+          console.log(err);
+          that.$message.error("删除失败");
+        });
     },
     // 新建部门
     submitCreateDepartment(e) {
@@ -174,30 +174,33 @@ export default {
           // 校验无错发起请求
           console.log("CreateDepartment: ", values);
 
-          that.$http
-            .post(appConfigs.ApiBaseUrl + "/departments/department", values, {
+          Axios.post(
+            appConfigs.ApiBaseUrl + "/departments/department",
+            values,
+            {
               headers: {
                 Token: localStorage.getItem("token")
               }
-            })
-
-            .then(
-              resp => {
-                if (resp.status == 200 && resp.body.status == 200) {
-                  that.$message.success(
-                    "创建成功",
-                    resp.body.data.departmentName
-                  );
-                  that.getData();
-                } else {
-                  that.$message.warning(resp.body.msg);
-                }
-              },
-              resp => {
-                // failed
-                that.$message.error("创建失败");
+            }
+          )
+            .then(resp => {
+              if (resp.status == 200 && resp.data.status == 200) {
+                that.$message.success(
+                  "创建成功",
+                  resp.data.data.departmentName
+                );
+                that.getData();
+              } else {
+                console.log(resp);
+                that.$message.warning(resp.data.msg);
               }
-            );
+            })
+            .catch(err => {
+              // failed
+              console.log("新建部门错误");
+              console.log(err);
+              that.$message.error("创建失败");
+            });
         }
       });
     },
@@ -205,66 +208,66 @@ export default {
     // 显示部门列表
     getData() {
       let that = this;
-      this.$http.get(appConfigs.ApiBaseUrl + "/departments/all",{
-        headers: {Token: localStorage.getItem('token')}
-      }).then(
-        resp => {
-          if (resp.status == 200 && resp.body.status == 200) {
-            that.data = resp.body.data;
+      Axios.get(appConfigs.ApiBaseUrl + "/departments/all", {
+        headers: { Token: localStorage.getItem("token") }
+      })
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.data = resp.data.data;
             that.loadMembersCounts();
           }
           that.loading = false;
-        },
-        resp => {
+        })
+        .catch(err => {
           //fail
+          console.log("无法获取部门列表");
+          console.log(err);
           that.$message.warning("无法获取部门列表");
           that.loading = false;
-        }
-      );
+        });
     },
     loadMembersCounts() {
       let that = this;
       that.data.map((department, idx, rawArr) => {
-        that.$http
-          .get(
-            appConfigs.ApiBaseUrl + "/departments/membersCount/" + department.id,{
-              headers: {Token: localStorage.getItem('token')}
+        Axios.get(
+          appConfigs.ApiBaseUrl + "/departments/membersCount/" + department.id,
+          {
+            headers: { Token: localStorage.getItem("token") }
+          }
+        )
+          .then(resp => {
+            if (resp.status == 200 && resp.data.status == 200) {
+              department.membersCount = resp.data.data;
+            } else {
+              that.$message.info(resp.data.msg);
             }
-          )
-          .then(
-            resp => {
-              if (resp.status == 200 && resp.body.status == 200) {
-                department.membersCount = resp.body.data;
-              } else {
-                that.$message.info(resp.body.msg);
-              }
-            },
-            resp => {
-              that.$message.warning("无法获取部门成员数量");
-            }
-          );
+          })
+          .catch(err => {
+            console.log("无法获取部门成员数量");
+            console.log(err);
+            that.$message.warning("无法获取部门成员数量");
+          });
       });
     },
     onSelectChange(id) {
       // 修改搜索范围，重新加载页面部门列表
       let that = this;
-      that.$http
-        .get(appConfigs.ApiBaseUrl + "/departments/ofDistrict/" + id, {
-          headers: {Token: localStorage.getItem('token')}
-        })
-        .then(
-          resp => {
-            if (resp.status == 200 && resp.body.status == 200) {
-              that.data = resp.body.data;
-              that.loadMembersCounts();
-            } else {
-              that.$message.info(resp.body.msg);
-            }
-          },
-          resp => {
-            that.$message.warning("加载失败");
+      Axios.get(appConfigs.ApiBaseUrl + "/departments/ofDistrict/" + id, {
+        headers: { Token: localStorage.getItem("token") }
+      })
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.data = resp.data.data;
+            that.loadMembersCounts();
+          } else {
+            that.$message.info(resp.data.msg);
           }
-        );
+        })
+        .catch(err => {
+          console.log("加载页面部门列表错误");
+          console.log(err);
+          that.$message.warning("加载失败");
+        });
     }
   }
 };

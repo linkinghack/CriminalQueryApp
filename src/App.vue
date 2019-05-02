@@ -6,7 +6,6 @@
       width="240"
       :theme="theme"
       @collapse="onCollapse"
-      @breakpoint="onBreakpoint"
     >
       <div class="logo">逃犯查询系统</div>
       <!-- 菜单栏 -->
@@ -18,34 +17,22 @@
         :selectedKeys="[current]"
         @click="handleClick"
       >
-        <a-sub-menu key="sub1">
-          <span slot="title">
-            <a-icon type="database"/>
-            <span>查询系统</span>
-          </span>
-          <a-menu-item key="1">
-            <router-link :to="{name:'criminalquery'}">
-              <a-icon type="folder-open"/>逃犯查询
-            </router-link>
-          </a-menu-item>
-          <a-menu-item key="2">
-            <a-icon type="folder-open"/>通缉令查询
-          </a-menu-item>
-          <a-menu-item key="3">
-            <a-icon type="pie-chart"/>数据统计
-          </a-menu-item>
-        </a-sub-menu>
+        <a-menu-item key="1">
+          <router-link :to="{name:'criminalquery'}">
+            <a-icon type="folder-open"/>逃犯查询
+          </router-link>
+        </a-menu-item>
 
         <a-sub-menu key="sub2">
           <span slot="title">
             <a-icon type="warning"/>
             <span>通缉管理</span>
           </span>
-          
+
           <a-menu-item key="4">
-          <router-link :to="{name:'submitcriminal'}">发起通缉</router-link>
+            <router-link :to="{name:'submitcriminal'}">发起通缉</router-link>
           </a-menu-item>
-          
+
           <a-menu-item key="6">我发布的通缉令</a-menu-item>
           <a-menu-item key="7">我发布的嫌犯</a-menu-item>
           <a-menu-item key="8">申请广范围发布本区通缉</a-menu-item>
@@ -62,7 +49,9 @@
             </router-link>
           </a-menu-item>
           <a-menu-item key="10">
-            <a-icon type="solution"/>成员管理
+            <router-link :to="{name: 'userManage'}"> 
+              <a-icon type="solution"/>成员管理
+            </router-link>
           </a-menu-item>
         </a-sub-menu>
 
@@ -75,7 +64,10 @@
             <a-icon type="security-scan"/>通缉令发布审批
           </a-menu-item>
           <a-menu-item key="12">
-            <a-icon type="info-circle"/>新用户审批
+            <router-link :to="{name: 'registerApplications'}"> 
+              <a-icon type="info-circle"/>新用户审批
+            </router-link>
+            
           </a-menu-item>
         </a-sub-menu>
 
@@ -100,8 +92,8 @@
             你好:
             <span v-if="user.role==1">管理员</span>
             {{user.realName}}
-            <a-divider type="vertical" />
-            <span v-if="userDepartment"> 所属部门: {{userDepartment.departmentName}} </span>
+            <a-divider type="vertical"/>
+            <span v-if="userDepartment">所属部门: {{userDepartment.departmentName}}</span>
           </div>
           <div v-else>
             <span>请登录</span>
@@ -127,6 +119,7 @@
 </template>
 <script>
 import appConfigs from "./configs";
+import Axios from "axios";
 export default {
   data() {
     return {
@@ -134,21 +127,40 @@ export default {
       theme: "light"
     };
   },
+  created() {
+    let that = this;
+    console.log("Vue instance initiated.");
+    Axios.interceptors.response.use(
+      response => {
+        if (response.status == 405) {
+          that.$message.warning("Token过期,请重新登录");
+          that.$router.push({ name: "login" });
+          this.$store.commit('user', null)
+          this.$store.commit('token', null)
+        } 
+        return response
+      },
+      err => {
+        localStorage.clear()
+        this.$store.commit('user', null)
+        this.$store.commit('token', null)
+        return Promise.reject(err);
+      }
+    );
+    // 立即进行一次token测试
+    Axios.get(appConfigs.ApiBaseUrl + "/user/alive", {
+      headers: {Token: localStorage.getItem('token')}
+    });
+  },
   methods: {
     onCollapse(collapsed, type) {
       console.log(collapsed, type);
-    },
-    onBreakpoint(broken) {
-      console.log(broken);
     },
     handleClick(e) {
       this.currentSel = e.key;
     },
     onCollapse(collapsed, type) {
       console.log(collapsed, type);
-    },
-    onBreakpoint(broken) {
-      console.log(broken);
     },
     login(e) {
       this.$router.push({ name: "login" });
@@ -158,22 +170,25 @@ export default {
     },
     logout(e) {
       console.log("logout");
-      let that = this
-      this.$http
-        .post(appConfigs.ApiBaseUrl + "/sso/logout/" + localStorage.getItem('token'))
-        .then(resp => {}, resp => {});
+      let that = this;
+      Axios
+        .post(
+          appConfigs.ApiBaseUrl + "/sso/logout/" + localStorage.getItem("token")
+        )
+        .then(resp => {})
+        .catch(err => {});
       this.$store.commit("user", null);
-      this.$store.commit('userDepartment', null)
-      this.$router.replace({ name: "login"} )
-      localStorage.clear()
+      this.$store.commit("userDepartment", null);
+      this.$router.replace({ name: "login" });
+      localStorage.clear();
     }
   },
   computed: {
     user() {
-      return this.$store.getters.user
+      return this.$store.getters.user;
     },
     userDepartment() {
-      return this.$store.getters.userDepartment
+      return this.$store.getters.userDepartment;
     },
     current() {
       // 使用计算属性来实现选中项 路径同步

@@ -1,0 +1,201 @@
+<template>
+  <div class="page">
+    <div v-if="currentUser.role == 1">
+      <!-- 搜索框 -->
+      <a-row>
+        <a-col :span="12">
+          <a-input-search
+            placeholder="搜索姓名或登录id"
+            @search="onSearch"
+            :value="searchKey"
+            enterButton
+          />
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+          <a-table
+            :columns="columns"
+            :rowKey="record => record.id"
+            :dataSource="activatedUserList"
+            :pagination="pagination"
+            :loading="loading"
+            @change="onTableChange"
+          >
+            <span slot="action" slot-scope="text, record">
+              <a-popconfirm
+                slot="actions"
+                title="驳回将直接删除此注册信息,确认删除？"
+                @confirm="deleteUser(record.id)"
+              >
+                <a-icon slot="icon" type="question-circle-o" style="color: red"/>
+                <a href="#">驳回</a>
+              </a-popconfirm>
+              <a-divider type="vertical"/>
+              <a-popconfirm slot="actions" title="确认认证通过?" @confirm="activateUser(record.id)">
+                <a-icon slot="icon" type="question-circle-o" style="color: red"/>
+                <a href="#">通过</a>
+              </a-popconfirm>
+            </span>
+          </a-table>
+        </a-col>
+      </a-row>
+    </div>
+    <div v-else>
+      <a-row>您不是管理员，无权访问此页面</a-row>
+    </div>
+  </div>
+</template>
+
+<script>
+import Axios from "axios";
+import appConfigs from "../configs";
+import { constants } from "crypto";
+const columns = [
+  {
+    title: "用户登录ID",
+    dataIndex: "userID"
+  },
+  {
+    title: "用户姓名",
+    dataIndex: "realName"
+  },
+  {
+    title: "邮箱",
+    dataIndex: "email",
+    width: "15%"
+  },
+  {
+    title: "申请角色",
+    dataIndex: "role"
+  },
+  {
+    title: "所属部门",
+    dataIndex: "department.departmentName"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: { customRender: "action" }
+  }
+];
+export default {
+  data() {
+    return {
+      columns,
+      loading: false,
+      searchKey: null,
+      pagination: {
+        pageSize: 10
+      }
+    };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.getters.user;
+    },
+    activatedUserList() {
+      return this.$store.getters.activatedUserList;
+    }
+  },
+  mounted() {
+    this.getUserList("");
+  },
+  methods: {
+    roleName(role) {
+      if (role == 1) {
+        return "管理员";
+      } else {
+        return "普通用户";
+      }
+    },
+    onSearch() {
+      let tempKey = "";
+      if (this.searchKey) {
+        tempKey = this.searchKey;
+      }
+      this.getUserList(tempKey, 10, 1);
+    },
+    deleteUser(uid) {
+      let that = this;
+      Axios.delete(appConfigs.ApiBaseUrl + "/user/" + uid, {
+        headers: { Token: localStorage.getItem("user") }
+      })
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.$message.success("已删除");
+            that.getUserList("", 10, 1); // 刷新列表
+          } else {
+            that.$message.warning(resp.data.data);
+          }
+        })
+        .catch(err => {
+          console.log("删除用户异常");
+          console.log(err);
+          that.$message(err);
+        });
+    },
+    activateUser(uid) {
+      let that = this;
+      Axios.patch(
+        appConfigs.ApiBaseUrl + "/user/activate/" + uid,
+        {},
+        {
+          headers: { Token: localStorage.getItem("token") }
+        }
+      )
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.$message.success("已激活");
+            that.getUserList("", 10, 1);
+          } else {
+            that.$message.warning(resp.data.data);
+          }
+        })
+        .catch(err => {
+          console.log("激活用户异常");
+          console.log(err);
+          that.$message.error(err);
+        });
+    },
+    onTableChange(pagination, filters, sorter) {
+      console.log(pagination);
+      // 读取最近一次搜索条件并按照指定分页搜索
+      this.getUserList(this.searchKey, pagination.pageSize, pagination.page);
+    },
+    getUserList(condition, pageSize, page) {
+      let that = this;
+      that.loading = true;
+      Axios.get(appConfigs.ApiBaseUrl + "/user/inactivated", {
+        params: { nameOrID: condition, pageSize: pageSize, page: page },
+        headers: { Token: localStorage.getItem("token") }
+      })
+        .then(resp => {
+          that.loading = false;
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.$store.commit("activatedUserList", resp.data.data.users);
+            that.pagination.pageSize = resp.data.data.pageSize;
+            that.pagination.page = resp.data.data.page;
+          } else {
+            that.$message.warning(resp.data.data);
+          }
+        })
+        .catch(err => {
+          that.loading = false;
+          console.log("获取激活用户列表失败");
+          console.log(err);
+          that.$message.error("获取用户列表错误");
+          that.$message.error(err);
+        });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.page {
+  width: 100%;
+}
+</style>
+
+

@@ -63,6 +63,21 @@
         ]"
         />
       </a-form-item>
+      <a-form-item v-bind="formItemLayout" label="邮箱验证码">
+        <a-row :gutter="8">
+          <a-col :span="12">
+            <a-input
+              v-decorator="[
+              'captcha',
+              {rules: [{ required: true, message: '请输入邮箱验证码!' }]}
+            ]"
+            />
+          </a-col>
+          <a-col :span="12">
+            <a-button>获取验证码</a-button>
+          </a-col>
+        </a-row>
+      </a-form-item>
       <a-form-item v-bind="formItemLayout" label="姓名">
         <a-input
           v-decorator="[
@@ -74,6 +89,12 @@
           }
         ]"
         />
+      </a-form-item>
+      <a-form-item v-bind="formItemLayout" label="申请成为角色">
+        <a-select v-decorator="[ 'role', {rules: [{required: true, message: '申请角色必选'}]} ]">
+          <a-select-option value="1">管理员</a-select-option>
+          <a-select-option value="0">普通用户</a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item v-bind="formItemLayout">
         <span slot="label">
@@ -122,22 +143,6 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item v-bind="formItemLayout" label="验证码">
-        <a-row :gutter="8">
-          <a-col :span="12">
-            <a-input
-              v-decorator="[
-              'captcha',
-              {rules: [{ required: true, message: '请输入邮箱验证码!' }]}
-            ]"
-            />
-          </a-col>
-          <a-col :span="12">
-            <a-button>获取验证码</a-button>
-          </a-col>
-        </a-row>
-      </a-form-item>
-
       <a-form-item v-bind="tailFormItemLayout">
         <a-button type="primary" html-type="submit">注册</a-button>
       </a-form-item>
@@ -146,15 +151,10 @@
 </template>
 
 <script>
-import appConfigs from '../configs';
-import Vue from 'vue'
-import { Tooltip, TreeSelect } from 'ant-design-vue';
-import { constants } from 'crypto';
-import { notEqual } from 'assert';
-Vue.use(Tooltip)
-Vue.use(TreeSelect)
+import appConfigs from "../configs";
+import Axios from "axios";
 
-const treeData = []
+const treeData = [];
 
 export default {
   data() {
@@ -187,31 +187,32 @@ export default {
       }
     };
   },
-  
+
   beforeCreate() {
-    this.form = this.$form.createForm(this)
+    this.form = this.$form.createForm(this);
   },
   created() {
-    this.loadDepartments()
+    this.loadDepartments();
   },
   methods: {
     loadDepartments() {
       let that = this;
       // 加载省级部门数据
-      that.$http.get(appConfigs.ApiBaseUrl + '/departments/tree/nodes')
-        .then(
-        resp => {
+      Axios.get(appConfigs.ApiBaseUrl + "/departments/tree/nodes")
+        .then(resp => {
           // 成功
           console.log("provinces loaded. ", resp.status);
-          var data = resp.body;
+          var data = resp.data;
           if (data.status == "200") {
-            that.treeData = data.data
+            that.treeData = data.data;
           }
-        },
-        resp => {
-          // 失败
-          that.$message.error("无法加载省级部门数据");
         })
+        .catch(err => {
+          // 失败
+          console.log("无法加载省级部门数据");
+          console.log(err);
+          that.$message.error("无法加载省级部门数据");
+        });
     },
     handleSubmit(e) {
       // 提交注册
@@ -220,22 +221,23 @@ export default {
       this.form.validateFieldsAndScroll((err, values) => {
         if (!err) {
           console.log("Received values of form: ", values);
-          that.$http.post( appConfigs.ApiBaseUrl + "/user/register", values).then(
-            resp => {
+          Axios.post(appConfigs.ApiBaseUrl + "/user/register", values)
+            .then(resp => {
               // 成功
-              let respbody = resp.body;
+              let respbody = resp.data;
               if (resp.status == 200 && respbody.status == "200") {
                 that.$message.success(respbody.data);
               } else {
                 // 失败
                 that.$message.error("注册失败");
               }
-            },
-            resp => {
+            })
+            .catch(err => {
               // 失败
+              console.log("新用户注册失败");
+              console.log(err);
               that.$message.error("未知错误，注册失败");
-            }
-          );
+            });
         }
       });
     },
@@ -257,8 +259,8 @@ export default {
         form.validateFields(["confirm"], { force: true });
       }
       callback();
-    },
-  },
+    }
+  }
 };
 </script>
 

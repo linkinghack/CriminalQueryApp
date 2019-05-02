@@ -4,7 +4,6 @@
       id="components-form-demo-normal-login"
       :form="form"
       class="login-form center-container"
-  
       @submit="handleSubmit"
     >
       <a-form-item>
@@ -49,76 +48,86 @@
 </template>
 
 <script>
-import appConfigs from '../configs';
-import axios from 'axios';
-import Vue from 'vue';
-import { Checkbox } from 'ant-design-vue';
-Vue.use(Checkbox)
+import appConfigs from "../configs";
+import Axios from "axios";
+import Vue from "vue";
+import { Checkbox } from "ant-design-vue";
+Vue.use(Checkbox);
 
 export default {
   beforeCreate() {
     this.form = this.$form.createForm(this);
   },
   created() {
-    console.log('configs loaded: ', appConfigs)
+    console.log("configs loaded: ", appConfigs);
   },
   methods: {
     loadUserDepartment() {
-        let user = this.$store.getters.user;
-        let that = this;
-        if(user) {
-          console.log("用户信息存在，加载所属部门信息")
-          axios.get(appConfigs.ApiBaseUrl + "/user/ofDepartment/" + user.id, {
-            headers: {Token: localStorage.getItem('token')}
+      let user = this.$store.getters.user;
+      let that = this;
+      if (user) {
+        console.log("用户信息存在，加载所属部门信息");
+        Axios
+          .get(appConfigs.ApiBaseUrl + "/user/ofDepartment/" + user.id, {
+            headers: { Token: localStorage.getItem("token") }
+          }).then(resp => {
+            console.log('加载所属部门:返回结果')
+            console.log(resp)
+            if (resp.status == 200 && resp.data.status == 200) {
+              let department = resp.data.data;
+              localStorage.setItem(
+                "userDepartment",
+                JSON.stringify(department)
+              );
+              that.$store.commit("userDepartment", department);
+            } else {
+              that.$message.warning("无法加载所属部门信息");
+            }
           })
-            .then(response => {
-              if(response.status == 200 && response.data.status==200) {
-                let department = response.data.data
-                localStorage.setItem('userDepartment', JSON.stringify(department))
-                that.$store.commit('userDepartment', department)
-              } else {
-                that.$message.warning("无法加载所属部门信息")
-              }
-            })
-            .catch(error => {
-              console.log(error)
-              that.$message.error("加载所属部门错误")
-            })
-        }
-    }
-    ,
+          .catch(error => {
+            console.log(error);
+            that.$message.error("加载所属部门错误");
+          });
+      }
+    },
     handleSubmit(e) {
       e.preventDefault();
       let that = this;
       this.form.validateFields((err, values) => {
+        console.log('登录请求前校验：')
+        console.log(err)
         if (!err) {
-          that.$http.post( appConfigs.ApiBaseUrl + "/sso/login", values).then(
-            resp => {
+          Axios
+            .post(appConfigs.ApiBaseUrl + "/sso/login", values)
+            .then(function(resp) {
+              console.log(resp)
               console.log("status: ", resp.status);
-              console.log(resp.body);
-              var respBody = resp.body;
+              console.log(resp.data);
+              var respBody = resp.data;
               if (respBody.status == 200) {
                 that.$message.success("登录成功!");
                 that.$store.commit("user", respBody.data.user);
-                localStorage.setItem('token', respBody.data.token);
-                localStorage.setItem('user', JSON.stringify(respBody.data.user));
+                localStorage.setItem("token", respBody.data.token);
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify(respBody.data.user)
+                );
 
                 // 异步加载用户所属部门
                 that.loadUserDepartment();
 
                 that.$router.push(
-                  that.$route.params.wantedPath || { name: "home" }
+                  that.$route.params.wantedPath || { name: "criminalquery" }
                 );
               } else {
                 that.$message.warning(respBody.data);
               }
-            },
-            resp => {
+            })
+            .catch(function(error) {
               console.log("登录失败");
-              console.log(resp);
-              that.$message.error("系统错误");
-            }
-          );
+              console.log(error);
+              that.$message.error("系统错误,登录失败");
+            });
         }
       });
     }

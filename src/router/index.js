@@ -10,18 +10,22 @@ import Departments from '@/components/DepartmentManage'
 import CriminalQuery from '@/components/CriminalQuery'
 import SubmitCriminalAndWantedOrder from '@/components/SubmitCriminalAndWantedOrder'
 import CriminalDetail from '@/components/CriminalDetail'
+import UserManage from '@/components/UserManage'
+import UserRegisterApplications from '@/components/UserRegisterApplications'
 Vue.use(VueRouter);
 
 const routers = [
-  { path: '/', name: 'home', component: Home, meta: {private: true} },
+  { path: '/', name: 'home', component: CriminalQuery, meta: {private: true} },
   // something else
   { path: '/faq', name: 'faq', component: FAQ, meta: {private: true}},
   { path: '/login', name: 'login', component: Login},
   { path: '/register', name: 'register', component: Register},
-  { path: '/departments', name: 'departments', component: Departments},
-  { path: '/criminalquery', name: 'criminalquery', component: CriminalQuery},
-  { path: '/submitcriminal', name: 'submitcriminal', component: SubmitCriminalAndWantedOrder},
-  { path: '/criminalDetail', name: 'criminalDetail', component: CriminalDetail},
+  { path: '/departments', name: 'departments', component: Departments , meta: {private: true}},
+  { path: '/criminalquery', name: 'criminalquery', component: CriminalQuery, meta: {private: true}},
+  { path: '/submitcriminal', name: 'submitcriminal', component: SubmitCriminalAndWantedOrder, meta: {private: true}},
+  { path: '/criminalDetail', name: 'criminalDetail', component: CriminalDetail, meta: {private: true}},
+  { path: '/userManage', name: 'userManage', component: UserManage, meta: {private: true}},
+  { path: '/registerApplications', name: 'registerApplications', component: UserRegisterApplications, meta: {private: true}},
 
   // not found page
   { path: '*', component: NotFound }

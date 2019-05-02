@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import appConfigs from '../configs';
+import appConfigs from "../configs";
+import Axios from "axios";
 export default {
   props: ["value", "placeHolder"],
   data() {
@@ -21,34 +22,33 @@ export default {
   methods: {
     departmentSelected(value, label, extra) {
       this.$emit("change", value);
-      this.loadData()
+      this.loadData();
     },
     loadData() {
-      console.log("DeaprtmentSelector: loading data...")
+      console.log("DeaprtmentSelector: loading data...");
       let that = this;
       // 加载省级部门数据
-      that.$http.get(appConfigs.ApiBaseUrl + "/departments/tree/nodes", {
+      Axios.get(appConfigs.ApiBaseUrl + "/departments/tree/nodes", {
         headers: {
           Token: localStorage.getItem("token")
         }
-      }).then(
-        resp => {
+      })
+        .then(resp => {
           // 成功
           console.log("provinces loaded. ", resp.status);
-          var data = resp.body;
+          var data = resp.data;
           if (data.status == "200") {
             that.treeData = data.data;
           }
-        },
-        resp => {
+        })
+        .catch(resp => {
           // 失败
           that.$message.error("无法加载省级部门数据");
-        }
-      );
+        });
     }
   },
-  mounted(){
-      this.loadData()
+  mounted() {
+    this.loadData();
   }
 };
 </script>

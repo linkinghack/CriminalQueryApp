@@ -43,7 +43,10 @@ const store = new Vuex.Store({
             newWantedOrder: null,
             currentCriminalDetail: null,
             criminalSearchResult: null,
+            preciseSearchResult: null,
             searchParams: {},
+            activatedUserList: null,
+            inactivatedUserList: null,
         }
     },
     // 通过$store.commit('datakey', dataObj)来调用mutation
@@ -72,8 +75,17 @@ const store = new Vuex.Store({
         criminalSearchResult: (state, result) => {
             state.criminalSearchResult = result
         },
+        preciseSearchResult: (state, result) => {
+            state.preciseSearchResult = result
+        },
         searchParams: (state, params) => {
             state.searchParams = params
+        },
+        activatedUserList: (state, userList) => {
+            state.activatedUserList = userList
+        },
+        inactivatedUserList: (state, userList) => {
+            state.inactivatedUserList = userList
         }
     },
     // 相当于计算属性
@@ -87,6 +99,9 @@ const store = new Vuex.Store({
         currentCriminalDetail: state => state.currentCriminalDetail,
         criminalSearchResult: state => state.criminalSearchResult,
         searchParams: state => state.searchParams,
+        preciseSearchResult: state => state.preciseSearchResult,
+        activatedUserList: state => state.activatedUserList,
+        inactivatedUserList: state => state.inactivatedUserList,
     }
 })
 

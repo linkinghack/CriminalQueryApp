@@ -4,14 +4,13 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-import VueResource from 'vue-resource'
+// import VueResource from 'vue-resource'
 import * as filters from './filter'
-import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Popconfirm, Card, Switch, Collapse, Avatar}from 'ant-design-vue'
+import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Card, Switch, Collapse, Avatar}from 'ant-design-vue'
 import {Col, Row, List, Select, Cascader} from 'ant-design-vue'
-import {message, notification, Modal} from 'ant-design-vue'
+import {message, notification, Modal, Popconfirm, Tooltip, TreeSelect} from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import appConfigs from './configs';
-
 
 Vue.config.productionTip = false
 
@@ -21,7 +20,7 @@ for (const key in filters) {
 }
 
 // http client
-Vue.use(VueResource);
+// Vue.use(VueResource);
 
 //antd
 Vue.use(Layout)
@@ -51,6 +50,8 @@ Vue.use(Card)
 Vue.use(Switch)
 Vue.use(Collapse)
 Vue.use(Avatar)
+Vue.use(Tooltip);
+Vue.use(TreeSelect);
 Vue.prototype.$message = message;
 Vue.prototype.$notification = notification;
 Vue.prototype.$info = Modal.info;
@@ -59,23 +60,11 @@ Vue.prototype.$error = Modal.error;
 Vue.prototype.$warning = Modal.warning;
 Vue.prototype.$confirm = Modal.confirm;
 
-/* eslint-disable no-new */
+
 new Vue({
   el: '#app',
   router,
   store,
   components: { App },
   template: '<App/>',
-  created() {
-    // 添加登录态前端校验
-    this.$http.interceptors.push(function(request) {
-      return function(response) {
-        if (response.status == 403) {
-          console.log('status 405')
-          that.$message.warn("登录态过期,请重新登录");
-          that.$router.replace({name:"login", params:{}})
-        }
-      }
-    });
-  },
 })

@@ -7,7 +7,9 @@ const appConfigs = {
         '/criminalDetail': "",
         '/login': "",
         '/register':"",
-        '/':""
+        '/userManage': "10",
+        '/registerApplications': "12",
+        '/':"1"
     },
     sexMap: {
         1:"男",
