@@ -14,7 +14,7 @@
       </a-row>
       <a-row>
         <a-col :span="24">
-          <a-table
+          <a-table style="margin-top:5px"
             :columns="columns"
             :rowKey="record => record.id"
             :dataSource="activatedUserList"
@@ -119,7 +119,7 @@ export default {
     deleteUser(uid) {
       let that = this;
       Axios.delete(appConfigs.ApiBaseUrl + "/user/" + uid, {
-        headers: { Token: localStorage.getItem("user") }
+        headers: { Token: localStorage.getItem("token") }
       })
         .then(resp => {
           if (resp.status == 200 && resp.data.status == 200) {

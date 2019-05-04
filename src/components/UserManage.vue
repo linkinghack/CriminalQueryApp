@@ -14,7 +14,7 @@
       </a-row>
       <a-row>
         <a-col :span="24">
-          <a-table
+          <a-table style="margin-top:5px"
             :columns="columns"
             :rowKey="record => record.id"
             :dataSource="activatedUserList"
@@ -22,6 +22,7 @@
             :loading="loading"
             @change="onTableChange"
           >
+          <span slot="role" slot-scope="text">{{roleName(text)}}</span>
             <span slot="action" slot-scope="text, record">
               <a-popconfirm slot="actions" title="确认删除？" @confirm="deleteUser(record.id)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red"/>
@@ -60,7 +61,8 @@ const columns = [
   },
   {
     title: "角色",
-    dataIndex: "role"
+    dataIndex: "role",
+    scopedSlots: { customRender: "role"}
   },
   {
     title: "所属部门",
@@ -117,7 +119,7 @@ export default {
         .then(resp => {
           if (resp.status == 200 && resp.data.status == 200) {
             that.$message.success("已删除");
-            that.getUserList("", 10, 1); // 刷新列表
+            that.getUserList(null, 10, 1); // 刷新列表
           } else {
             that.$message.warning(resp.data.data);
           }

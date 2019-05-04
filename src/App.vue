@@ -49,7 +49,7 @@
             </router-link>
           </a-menu-item>
           <a-menu-item key="10">
-            <router-link :to="{name: 'userManage'}"> 
+            <router-link :to="{name: 'userManage'}">
               <a-icon type="solution"/>成员管理
             </router-link>
           </a-menu-item>
@@ -64,10 +64,9 @@
             <a-icon type="security-scan"/>通缉令发布审批
           </a-menu-item>
           <a-menu-item key="12">
-            <router-link :to="{name: 'registerApplications'}"> 
+            <router-link :to="{name: 'registerApplications'}">
               <a-icon type="info-circle"/>新用户审批
             </router-link>
-            
           </a-menu-item>
         </a-sub-menu>
 
@@ -134,22 +133,29 @@ export default {
       response => {
         if (response.status == 405) {
           that.$message.warning("Token过期,请重新登录");
-          that.$router.push({ name: "login" });
-          this.$store.commit('user', null)
-          this.$store.commit('token', null)
-        } 
-        return response
+          that.$store.commit("user", null);
+          that.$store.commit("token", null);
+          that.$router.replace({ name: "login" });
+        }
+        return response;
       },
       err => {
-        localStorage.clear()
-        this.$store.commit('user', null)
-        this.$store.commit('token', null)
+        that.$message.error(err)
         return Promise.reject(err);
       }
     );
+  },
+  mounted() {
     // 立即进行一次token测试
     Axios.get(appConfigs.ApiBaseUrl + "/user/alive", {
-      headers: {Token: localStorage.getItem('token')}
+      headers: { Token: localStorage.getItem("token") }
+    }).then(resp => {
+      if (resp.status == 405) {
+        that.$message.warning("Token过期,请重新登录");
+        that.$store.commit("user", null);
+        that.$store.commit("token", null);
+        that.$router.push({ name: "login" });
+      }
     });
   },
   methods: {
@@ -171,10 +177,9 @@ export default {
     logout(e) {
       console.log("logout");
       let that = this;
-      Axios
-        .post(
-          appConfigs.ApiBaseUrl + "/sso/logout/" + localStorage.getItem("token")
-        )
+      Axios.post(
+        appConfigs.ApiBaseUrl + "/sso/logout/" + localStorage.getItem("token")
+      )
         .then(resp => {})
         .catch(err => {});
       this.$store.commit("user", null);
