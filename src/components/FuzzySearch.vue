@@ -245,6 +245,7 @@ export default {
     fuzzySearch(e) {
       e.preventDefault();
       let that = this;
+      that.$store.commit('searchParams', null) // 清楚搜索条件
       this.formFuzzy.validateFields((err, values) => {
         console.log(values);
         if (!err) {
@@ -326,7 +327,6 @@ export default {
     },
     handleReset() {
       this.formFuzzy.resetFields();
-      this.formPrecise.resetFields();
     },
     onTabChange(key) {
       console.log(key);

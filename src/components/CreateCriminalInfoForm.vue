@@ -187,7 +187,7 @@ export default {
           // axio request
           that.loading = true;
           axios
-            .put(appConfigs.ApiBaseUrl + "/criminal/basicInfo", values, {
+            .post(appConfigs.ApiBaseUrl + "/criminal/basicInfo", values, {
               headers: { Token: localStorage.getItem("token") }
             })
             .then(response => {

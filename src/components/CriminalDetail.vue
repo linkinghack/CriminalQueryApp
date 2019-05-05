@@ -7,7 +7,7 @@
         <a-card hoverable style="width: 90%">
           <img
             alt="example"
-            :src="criminalDetail.criminalBasicInfo.portraitFileURL || 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png' "
+            :src="criminalDetail.criminalBasicInfo.portraitFileURL || 'https://via.placeholder.com/220x270.png?text=NoPhoto' "
             slot="cover"
           >
           <a-card-meta :title="criminalDetail.criminalBasicInfo.name || '逃犯姓名'"/>
@@ -50,6 +50,20 @@
             class="attributeValue"
             :span="attributeValueSpan"
           >{{criminalDetail.criminalBasicInfo.height || "未知"}}</a-col>
+        </a-row>
+        <a-row class="attributeRow">
+          <a-col class="attributeName" :span="attributeNameSpan">(曾)住址:</a-col>
+          <a-col
+            class="attributeValue"
+            :span="attributeValueSpan"
+          >{{criminalDetail.criminalBasicInfo.address || "未添加"}}</a-col>
+        </a-row>
+        <a-row class="attributeRow">
+          <a-col class="attributeName" :span="attributeNameSpan">籍贯:</a-col>
+          <a-col
+            class="attributeValue"
+            :span="attributeValueSpan"
+          >{{criminalDetail.criminalBasicInfo.bornPlace || "未添加"}}</a-col>
         </a-row>
         <a-row class="attributeRow">
           <a-col class="attributeName" :span="attributeNameSpan">其他特征:</a-col>
@@ -169,9 +183,9 @@
           </a-popconfirm>
         </span>
       </a-table>
-      <template v-for="order of criminalDetail.wantedOrders">
+      <!-- <template v-for="order of criminalDetail.wantedOrders">
         <a-row :key="order.id"></a-row>
-      </template>
+      </template>-->
     </a-row>
     <a-row type="flex" justify="end">
       <a-col :span="4">
@@ -195,7 +209,50 @@
     <a-row v-if="!(criminalDetail.clues && criminalDetail.clues.length > 0)">
       <div>暂无数据</div>
     </a-row>
-    <a-row v-else></a-row>
+    <a-row v-else class="info-section">
+      <a-table
+        :columns="clueColumns"
+        :dataSource="criminalDetail.clues"
+        :pagination="cluePagination"
+        rowKey="id"
+      >
+        <span slot="fileURLs" slot-scope="fileURLs, clue">
+          <span v-if="fileURLs && fileURLs.length">
+            <a href="#" @click="showCluePictures(fileURLs)">查看照片</a>
+            <!-- 照片查看modal -->
+            <a-drawer
+              title="线索照片"
+              height="480"
+              placement="bottom"
+              :closable="false"
+              @close="cancleCluePicModal"
+              :visible="cluePicModalVisible"
+            >
+              <p style="height:390">
+                <a-carousel arrows dotsClass="slick-dots slick-thumb">
+                  <a slot="customPaging" slot-scope="props">
+                    <img :src="getModalPicURL(props.i)">
+                  </a>
+                  <div v-for="item in modalPictures">
+                    <img :src="item">
+                  </div>
+                </a-carousel>
+              </p>
+            </a-drawer>
+          </span>
+          <span v-else>没有照片</span>
+        </span>
+        <!-- <span slot="action" slot-scope="text, record">
+          <a-divider type="vertical"/>
+          <a href="javascript:;">编辑</a>
+          <a-divider type="vertical"/>
+          <a-popconfirm slot="actions" title="确认删除？" @confirm="deleteClue(record)">
+            <a-icon slot="icon" type="question-circle-o" style="color: red"/>
+            <a href="#">删除</a>
+          </a-popconfirm>
+        </span>-->
+      </a-table>
+    </a-row>
     <a-row type="flex" justify="end">
       <a-col :span="4">
         <a-button type="primary" @click="showNewCluePage">添加线索</a-button>
@@ -251,6 +308,24 @@ const wantedOrderColumns = [
   }
 ];
 
+const clueColumns = [
+  {
+    title: "照片",
+    dataIndex: "fileURLs",
+    key: "fileURLs",
+    scopedSlots: { customRender: "fileURLs" }
+  },
+  {
+    title: "线索描述",
+    dataIndex: "description"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: { customRender: "action" }
+  }
+];
+
 export default {
   components: {
     BasicInfoEditor,
@@ -260,11 +335,17 @@ export default {
   data() {
     return {
       wantedOrderColumns,
+      clueColumns,
       basicInfoEditorVisible: false,
       orderAppenderVisible: false,
       newCluePageVisible: false,
       attributeNameSpan: 7,
       attributeValueSpan: 16,
+      modalPictures: [],
+      cluePicModalVisible: false,
+      cluePagination: {
+        pageSize: 5
+      }
     };
   },
   computed: {
@@ -272,6 +353,7 @@ export default {
       return this.$store.getters.currentCriminalDetail;
     }
   },
+  mounted() {},
   methods: {
     sexSwitch(sex) {
       return appConfigs.sexMap[sex];
@@ -292,6 +374,9 @@ export default {
     orderAppenderClose() {
       this.orderAppenderVisible = false;
     },
+    getModalPicURL(idx) {
+      return this.modalPictures[idx];
+    },
     showOrderAppender() {
       let that = this;
       this.$store.commit(
@@ -300,11 +385,18 @@ export default {
       ); // 确保添加通缉令组件正常工作
       this.orderAppenderVisible = true;
     },
+    showCluePictures(fileURLs) {
+      this.modalPictures = fileURLs;
+      this.cluePicModalVisible = true;
+    },
+    cancleCluePicModal() {
+      this.cluePicModalVisible = false;
+    },
     newCluePageClose() {
       this.newCluePageVisible = false;
     },
     showNewCluePage() {
-        this.$store.commit('currentCriminalDetail', this.criminalDetail)
+      this.$store.commit("currentCriminalDetail", this.criminalDetail);
       this.newCluePageVisible = true;
     },
     updateDetail() {
@@ -350,10 +442,10 @@ export default {
         .catch(error => {});
     },
     updateCriminalDetail(criminalID) {
-      axios
-        .get(appConfigs.ApiBaseUrl + "/criminal/detailByID/" + criminalID, {
-          headers: { Token: localStorage.getItem("token") }
-        })
+      let that = this;
+      Axios.get(appConfigs.ApiBaseUrl + "/criminal/detailByID/" + criminalID, {
+        headers: { Token: localStorage.getItem("token") }
+      })
         .then(resp => {
           if (resp.status == 200 && resp.data.status == 200) {
             that.$store.commit("currentCriminalDetail", resp.data.data);
@@ -384,6 +476,32 @@ export default {
 
 .info-section {
   min-height: 30px;
+}
+
+/* For modal pic preview */
+.ant-carousel >>> .slick-dots {
+  height: auto;
+}
+.ant-carousel >>> .slick-slide img {
+  border: 5px solid #fff;
+  display: block;
+  margin: auto;
+  max-width: 80%;
+}
+.ant-carousel >>> .slick-thumb {
+  bottom: -45px;
+}
+.ant-carousel >>> .slick-thumb li {
+  width: 60px;
+  height: 45px;
+}
+.ant-carousel >>> .slick-thumb li img {
+  width: 100%;
+  height: 100%;
+  filter: grayscale(100%);
+}
+.ant-carousel >>> .slick-thumb li.slick-active img {
+  filter: grayscale(0%);
 }
 </style>
 

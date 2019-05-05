@@ -29,7 +29,7 @@
     <a-form-item label="线索描述" v-bind="formItemLayout">
       <a-textarea
         v-decorator="[
-          'arrestReason',
+          'description',
           {rules: [{ required: true, message: '自然语言描述线索' }]}
         ]"
         placeholder="自然语言描述线索详情(出现时间地点等等)"
@@ -48,7 +48,7 @@
 
 <script>
 import appConfigs from "../configs";
-import axios from "axios";
+import Axios from "axios";
 export default {
   computed: {
     currentCriminal() {
@@ -65,7 +65,7 @@ export default {
     previewVisible: false,
     previewImage: "",
     fileList: [],
-    fileIDs: "",
+    fileIDs: ""
   }),
   beforeCreate() {
     this.form = this.$form.createForm(this);
@@ -74,7 +74,7 @@ export default {
     sexSwitch(sex) {
       return appConfigs.sexMap[sex];
     },
-        // 照片上传组件
+    // 照片上传组件
     normFile(e) {
       console.log("Upload event:", e);
       if (e.file.status === "done") {
@@ -103,32 +103,32 @@ export default {
     handleSubmit(e) {
       e.preventDefault();
       let that = this;
-      this.fileIDs = this.fileList.join(',') // fileID 逗号分割
+      this.fileIDs = this.fileList.join(","); // fileID 逗号分割
       this.form.validateFields((err, values) => {
         if (!err) {
-        console.log(values)
+          console.log(values);
+          console.log("数据校验结束");
+          console.log(that.currentCriminal);
           values.criminalID = that.currentCriminal.id;
+          values.fileIDs = that.fileIDs;
           // axio request
-          axios
-            .post(appConfigs.ApiBaseUrl + "/criminal/clue", values, {
-              headers: { Token: localStorage.getItem("token") }
-            })
+          Axios.post(appConfigs.ApiBaseUrl + "/criminal/clue", values, {
+            headers: { Token: localStorage.getItem("token") }
+          })
             .then(response => {
               that.loading = false;
               if (response.status == 200 && response.data.status == 200) {
-                
                 that.$message.success("线索已添加");
                 that.$emit("success");
                 // 加载刚刚提交的逃犯信息
-                axios
-                  .get(
-                    appConfigs.ApiBaseUrl +
-                      "/criminal/detailByID/" +
-                      that.newCriminalInfo.id,
-                    {
-                      headers: { Token: localStorage.getItem("token") }
-                    }
-                  )
+                Axios.get(
+                  appConfigs.ApiBaseUrl +
+                    "/criminal/detailByID/" +
+                    that.currentCriminal.id,
+                  {
+                    headers: { Token: localStorage.getItem("token") }
+                  }
+                )
                   .then(resp => {
                     if (resp.status == 200 && resp.data.status == 200) {
                       that.$store.commit(

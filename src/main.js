@@ -6,7 +6,7 @@ import router from './router'
 import store from './store'
 // import VueResource from 'vue-resource'
 import * as filters from './filter'
-import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Card, Switch, Collapse, Avatar}from 'ant-design-vue'
+import {Layout, Form, Table, Button, Menu, Icon, Input, Drawer, Steps, Upload, InputNumber, DatePicker, Spin, Divider, Card, Switch, Collapse, Avatar, Carousel}from 'ant-design-vue'
 import {Col, Row, List, Select, Cascader} from 'ant-design-vue'
 import {message, notification, Modal, Popconfirm, Tooltip, TreeSelect} from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
@@ -52,6 +52,7 @@ Vue.use(Collapse)
 Vue.use(Avatar)
 Vue.use(Tooltip);
 Vue.use(TreeSelect);
+Vue.use(Carousel)
 Vue.prototype.$message = message;
 Vue.prototype.$notification = notification;
 Vue.prototype.$info = Modal.info;

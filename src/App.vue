@@ -140,7 +140,10 @@ export default {
         return response;
       },
       err => {
-        that.$message.error(err)
+        that.$message.error("Token过期,请重新登录");
+        that.$store.commit("user", null);
+        that.$store.commit("token", null);
+        that.$router.replace({ name: "login" });
         return Promise.reject(err);
       }
     );
