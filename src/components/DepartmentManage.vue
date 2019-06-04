@@ -9,7 +9,7 @@
       </a-button>
       <a-drawer
         title="新建公安部门"
-        :width="720"
+        :width="500"
         @close="closeDrawer"
         :visible="drawerVisible"
         :wrapStyle="{height: 'calc(100% - 108px)',overflow: 'auto',paddingBottom: '108px'}"

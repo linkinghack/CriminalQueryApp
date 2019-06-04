@@ -130,7 +130,7 @@
           <a-form-item label="通缉原因">
             <a-input
               placeholder="通缉原因"
-              v-decorator="[ 'otherFeatures', {rules: [{ required: false }]} ]"
+              v-decorator="[ 'arrestReason', {rules: [{ required: false }]} ]"
             />
           </a-form-item>
         </a-collapse-panel>
@@ -161,6 +161,7 @@
           <span slot="action" slot-scope="text, record">
             <a @click="showCriminalDetail(record.id)">查看详情</a>
           </span>
+          <span slot="sex" slot-scope="text, record">{{ text == 1 ? '男' : '女'  }}</span>
           <span slot="createdAt" slot-scope="text, record">{{text | date}}</span>
         </a-table>
       </a-col>
@@ -188,6 +189,7 @@ const columns = [
   {
     title: "性别",
     dataIndex: "sex",
+    scopedSlots: { customRender: "sex" },
     width: "10%"
   },
   {
@@ -245,7 +247,7 @@ export default {
     fuzzySearch(e) {
       e.preventDefault();
       let that = this;
-      that.$store.commit('searchParams', null) // 清楚搜索条件
+      that.$store.commit('searchParams', null) // 清除搜索条件
       this.formFuzzy.validateFields((err, values) => {
         console.log(values);
         if (!err) {

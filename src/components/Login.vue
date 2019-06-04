@@ -98,7 +98,7 @@ export default {
         console.log(err)
         if (!err) {
           Axios
-            .post(appConfigs.ApiBaseUrl + "/sso/login", values)
+            .post(appConfigs.ApiSSOUrl + "/login", values)
             .then(function(resp) {
               console.log(resp)
               console.log("status: ", resp.status);

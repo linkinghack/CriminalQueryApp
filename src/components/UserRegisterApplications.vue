@@ -22,6 +22,7 @@
             :loading="loading"
             @change="onTableChange"
           >
+            <span slot="role" slot-scope="text, record"> {{text == 1 ? '管理员':'普通用户'}} </span>
             <span slot="action" slot-scope="text, record">
               <a-popconfirm
                 slot="actions"
@@ -67,7 +68,8 @@ const columns = [
   },
   {
     title: "申请角色",
-    dataIndex: "role"
+    dataIndex: "role",
+    scopedSlots: { customRender: "role"}
   },
   {
     title: "所属部门",

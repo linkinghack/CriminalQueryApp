@@ -173,6 +173,7 @@
           />
         </span>
         <span slot="arrestLevel" slot-scope="arrestLevel">{{levelSwitch(arrestLevel)}}</span>
+        <span slot="createdAt" slot-scope="createdAt">{{createdAt | date}}</span>
         <span slot="action" slot-scope="text, record">
           <!-- <a-divider type="vertical"/>
           <a href="javascript:;">编辑</a>
@@ -242,7 +243,7 @@
           </span>
           <span v-else>没有照片</span>
         </span>
-        <!-- <span slot="action" slot-scope="text, record">
+        <span slot="action" slot-scope="text, record">
           <a-divider type="vertical"/>
           <a href="javascript:;">编辑</a>
           <a-divider type="vertical"/>
@@ -250,7 +251,7 @@
             <a-icon slot="icon" type="question-circle-o" style="color: red"/>
             <a href="#">删除</a>
           </a-popconfirm>
-        </span>-->
+        </span>
       </a-table>
     </a-row>
     <a-row type="flex" justify="end">
@@ -300,6 +301,12 @@ const wantedOrderColumns = [
     dataIndex: "arrestStatus",
     key: "arrestStatus",
     scopedSlots: { customRender: "arrestStatus" }
+  },
+  {
+    title: "通缉时间",
+    dataIndex: "createdAt",
+    key: "createdAt",
+    scopedSlots: { customRender: "createdAt" }
   },
   {
     title: "操作",
@@ -431,18 +438,39 @@ export default {
     deleteWantedOrder(order) {
       this.$message.warning("删除order" + order.id);
       let that = this;
-      Axios.delete(appConfigs.ApiBaseUrl + "/wanted/order/" + order.id)
+      Axios.delete(appConfigs.ApiBaseUrl + "/wanted/order/" + order.id, {
+        headers: { Token: localStorage.getItem("token") }
+      })
         .then(resp => {
           if (resp.status == 200 && resp.data.status == 200) {
             that.$message.success("删除成功");
             // 更新currentCriminalDetail
-            updateCriminalDetail(that.criminalDetail.criminalBasicInfo.id);
+            that.updateDetail()
           }
         })
         .catch(error => {});
     },
+    deleteClue(record) {
+      console.log("delete clue: ");
+      console.log(record);
+      let that = this;
+      Axios.delete(appConfigs.ApiBaseUrl + "/criminal/clue/" + record.id, {
+        headers: { Token: localStorage.getItem("token") }
+      })
+        .then(resp => {
+          if (resp.status == 200 && resp.data.status == 200) {
+            that.$message.success("删除成功");
+            // 更新currentCriminalDetail
+            that.updateDetail()
+          } else {
+            that.$message.warning(resp.data.data);
+          }
+        })
+        .catch(err => {});
+    },
     updateCriminalDetail(criminalID) {
       let that = this;
+      console.log('重新加载逃犯信息： ' + criminalID)
       Axios.get(appConfigs.ApiBaseUrl + "/criminal/detailByID/" + criminalID, {
         headers: { Token: localStorage.getItem("token") }
       })

@@ -1,5 +1,6 @@
 const appConfigs = {
-    ApiBaseUrl:"https://api.tyut.life",
+    ApiBaseUrl:"https://grad.linkinghack.com/api",
+    ApiSSOUrl: "https://grad.linkinghack.com/sso",
     menuUrlMap: {
         '/criminalquery': "1",
         '/departments': "9",

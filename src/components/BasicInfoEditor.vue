@@ -160,6 +160,7 @@
 
 <script>
 import appConfigs from '../configs';
+import Axios from 'axios';
 
 export default {
   beforeCreate() {
@@ -196,8 +197,8 @@ export default {
             values.portraitFileID = that.fileList[0].fileID;
           // axio request
           that.loading = true;
-          axios
-            .post(appConfigs.ApiBaseUrl + "/criminal/basicInfo", values, {
+          Axios
+            .put(appConfigs.ApiBaseUrl + "/criminal/basicInfo", values, {
               headers: { Token: localStorage.getItem("token") }
             })
             .then(response => {
